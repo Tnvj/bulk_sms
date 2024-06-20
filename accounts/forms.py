@@ -2,6 +2,13 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm
 from .models import CustomUser
 
+class UploadFilesForm(forms.Form):
+    file1 = forms.FileField(required=False)
+    file2 = forms.FileField(required=False)
+    file3 = forms.FileField(required=False)
+    file4 = forms.FileField(required=False)
+    file5 = forms.FileField(required=False)
+    
 class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = CustomUser
