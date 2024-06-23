@@ -1,19 +1,60 @@
-{% extends "base_generic.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Files</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function updateFileInputs() {
+                const file1 = document.getElementById('id_file1');
+                const file2 = document.getElementById('id_file2');
+                const file3 = document.getElementById('id_file3');
+                const file4 = document.getElementById('id_file4');
+                const file5 = document.getElementById('id_file5');
+                const uploadButton = document.querySelector('button[type="submit"]');
 
-{% block content %}
-    <div class="container">
-        <h1>Upload Files</h1>
-        {% if messages %}
-            <ul class="messages">
-                {% for message in messages %}
-                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Upload</button>
-        </form>
-    </div>
-{% endblock %}
+                file2.disabled = !file1.files.length;
+                file3.disabled = !file1.files.length || !file2.files.length;
+                file4.disabled = !file1.files.length || !file2.files.length || !file3.files.length;
+                file5.disabled = !file1.files.length || !file2.files.length || !file3.files.length || !file4.files.length;
+                
+                // Enable the submit button only if file1 is uploaded
+                uploadButton.disabled = !file1.files.length;
+            }
+
+            updateFileInputs();
+
+            document.getElementById('id_file1').addEventListener('change', function () {
+                updateFileInputs();
+            });
+            document.getElementById('id_file2').addEventListener('change', function () {
+                updateFileInputs();
+            });
+            document.getElementById('id_file3').addEventListener('change', function () {
+                updateFileInputs();
+            });
+            document.getElementById('id_file4').addEventListener('change', function () {
+                updateFileInputs();
+            });
+            document.getElementById('id_file5').addEventListener('change', function () {
+                updateFileInputs();
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Upload Files</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" disabled>Upload</button>
+    </form>
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>

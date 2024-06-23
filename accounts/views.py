@@ -12,6 +12,8 @@ from .models import Contact
 
 @login_required
 def upload_files(request):
+    uploaded_files = {'file1': False, 'file2': False, 'file3': False, 'file4': False, 'file5': False}
+    
     if request.method == 'POST':
         form = UploadFilesForm(request.POST, request.FILES)
         if form.is_valid():
@@ -20,6 +22,7 @@ def upload_files(request):
                 file = request.FILES.get(file_field)
                 if file:
                     files_uploaded = True
+                    uploaded_files[file_field] = True
                     if file.name.endswith('.csv'):
                         data = csv.reader(file.read().decode('utf-8').splitlines())
                         next(data)  # Skip the header row
@@ -44,8 +47,9 @@ def upload_files(request):
                 messages.error(request, "Please upload files.")
     else:
         form = UploadFilesForm()
-    return render(request, 'upload_files.html', {'form': form})
     
+    return render(request, 'upload_files.html', {'form': form, 'uploaded_files': uploaded_files})
+
 def index(request):
     return render(request, 'index.html')
 
