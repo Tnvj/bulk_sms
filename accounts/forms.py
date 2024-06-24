@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm
 from .models import CustomUser
+from .models import UploadedFile
 
 class UploadFilesForm(forms.Form):
     file1 = forms.FileField(required=False)
@@ -27,3 +28,8 @@ class CustomAuthenticationForm(AuthenticationForm):
 class SMSSendForm(forms.Form):
     phone_number = forms.CharField(label='Phone Number', max_length=20, required=True)
     message = forms.CharField(label='Message', widget=forms.Textarea, required=True)
+
+class UploadFileForm(forms.ModelForm):
+    class Meta:
+        model = UploadedFile
+        fields = ['file']

@@ -1,19 +1,18 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
-from .forms import CustomUserCreationForm, CustomUserChangeForm, UploadFilesForm
+from .forms import CustomUserCreationForm, CustomUserChangeForm, UploadFileForm, SMSSendForm
 from django.shortcuts import render
 import csv
 import pandas as pd
-from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.conf import settings
 from twilio.rest import Client
-from .models import Contact
+from .models import Contact, UploadedFile
 from django.http import HttpResponse
-from accounts.forms import SMSSendForm
 from accounts.utils import send_sms
+
 
 @login_required
 def send_sms_view(request):
@@ -32,49 +31,37 @@ def send_sms_view(request):
 
     return render(request, 'send_sms.html', {'form': form})
 
+def upload_success(request):
+    return render(request, 'upload_success.html')
 
 @login_required
-def upload_files(request):
-    uploaded_files = {'file1': False, 'file2': False, 'file3': False, 'file4': False, 'file5': False}
-    
+def upload_file(request):
+    # Check if the user has already uploaded a file
+    already_uploaded = UploadedFile.objects.filter(user=request.user).exists()
+
     if request.method == 'POST':
-        form = UploadFilesForm(request.POST, request.FILES)
+        form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            files_uploaded = False
-            for file_field in ['file1', 'file2', 'file3', 'file4', 'file5']:
-                file = request.FILES.get(file_field)
-                if file:
-                    files_uploaded = True
-                    uploaded_files[file_field] = True
-                    if file.name.endswith('.csv'):
-                        data = csv.reader(file.read().decode('utf-8').splitlines())
-                        next(data)  # Skip the header row
-                        for row in data:
-                            Contact.objects.update_or_create(
-                                user=request.user,
-                                name=row[0],
-                                defaults={'phone_number': row[1]}
-                            )
-                    elif file.name.endswith(('.xls', '.xlsx')):
-                        data = pd.read_excel(file)
-                        for index, row in data.iterrows():
-                            Contact.objects.update_or_create(
-                                user=request.user,
-                                name=row['name'],
-                                defaults={'phone_number': row['phone_number']}
-                            )
-            if files_uploaded:
-                messages.success(request, "Contacts uploaded successfully.")
-                return redirect('index')
+            # Check again if the user has already uploaded (in case of concurrent requests)
+            if not already_uploaded:
+                uploaded_file = form.save(commit=False)
+                uploaded_file.user = request.user
+                uploaded_file.save()
+                messages.success(request, 'File uploaded successfully.')
+                return redirect('upload_success')  # Replace with your desired redirect
             else:
-                messages.error(request, "Please upload files.")
+                messages.error(request, 'You have already uploaded a file.')
+        else:
+            messages.error(request, 'Error uploading file. Please try again.')
     else:
-        form = UploadFilesForm()
-    
-    return render(request, 'upload_files.html', {'form': form, 'uploaded_files': uploaded_files})
+        form = UploadFileForm()
+
+    return render(request, 'upload_files.html', {'form': form, 'already_uploaded': already_uploaded})
+
 
 def index(request):
     return render(request, 'index.html')
+
 
 def register(request):
     if request.method == 'POST':
