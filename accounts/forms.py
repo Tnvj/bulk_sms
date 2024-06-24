@@ -23,3 +23,7 @@ class CustomAuthenticationForm(AuthenticationForm):
     class Meta:
         model = CustomUser
         fields = ('email', 'phone_number', 'password')
+
+class SMSSendForm(forms.Form):
+    phone_number = forms.CharField(label='Phone Number', max_length=20, required=True)
+    message = forms.CharField(label='Message', widget=forms.Textarea, required=True)

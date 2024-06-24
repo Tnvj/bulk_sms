@@ -8,7 +8,30 @@ import pandas as pd
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.conf import settings
+from twilio.rest import Client
 from .models import Contact
+from django.http import HttpResponse
+from accounts.forms import SMSSendForm
+from accounts.utils import send_sms
+
+@login_required
+def send_sms_view(request):
+    if request.method == 'POST':
+        form = SMSSendForm(request.POST)
+        if form.is_valid():
+            phone_number = form.cleaned_data['phone_number']
+            message = form.cleaned_data['message']
+
+            if send_sms(phone_number, message):
+                return HttpResponse('SMS sent successfully!')
+            else:
+                return HttpResponse('Failed to send SMS. Please try again later.')
+    else:
+        form = SMSSendForm()
+
+    return render(request, 'send_sms.html', {'form': form})
+
 
 @login_required
 def upload_files(request):
