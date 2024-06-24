@@ -29,6 +29,8 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 
+# settings.py
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -37,7 +39,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'myproject.middleware.TimestampMiddleware',  # Adjust this path based on your project structure
+    'accounts.middleware.SessionIdleTimeout',  # Adjust this path based on your project structure
 ]
+
 
 ROOT_URLCONF = 'myproject.urls'
 
@@ -103,3 +108,9 @@ STATIC_URL = 'static/'
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Session settings
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'  # Use the cache and database for session storage
+SESSION_COOKIE_AGE = 30 * 60  # Session expires in 30 minutes (30 minutes * 60 seconds)
+SESSION_SAVE_EVERY_REQUEST = True  # Save the session to the database on every request
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Expire session when the browser is closed
