@@ -27,28 +27,22 @@ This project is a simple SMS application built with Django. It includes user reg
 3. **Install the required packages**
 
     ```sh
-    pip install -r requirements.txt
+    pip install django mysqlclient
     ```
 
-4. **Install MySQL client library**
+
+4. **Configure the database**
+
+    Edit `myproject/settings.py` to configure your MySQL database settings under `DATABASES`.
+
+5. **Apply migrations**
 
     ```sh
-    pip install mysqlclient
-    ```
-
-5. **Configure the database**
-
-    Edit `myproject/settings.py` to configure your MySQL database.
-
-
-6. **Apply migrations**
-
-    ```sh
-    python manage.py makemigrations sms
+    python manage.py makemigrations
     python manage.py migrate
     ```
 
-7. **Create a superuser**
+6. **Create a superuser**
 
     ```sh
     python manage.py createsuperuser
@@ -56,7 +50,7 @@ This project is a simple SMS application built with Django. It includes user reg
 
     Follow the prompts to create a superuser account.
 
-8. **Run the development server**
+7. **Run the development server**
 
     ```sh
     python manage.py runserver
@@ -70,8 +64,3 @@ This project is a simple SMS application built with Django. It includes user reg
 - User login
 - Profile update
 - SMS functionalities
-
-
-## License
-
-This project is licensed under the MIT License.
